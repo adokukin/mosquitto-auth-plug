@@ -37,7 +37,7 @@
 #define SEPARATOR       "$"
 #define TRUE	(1)
 #define FALSE	(0)
-
+#define PWDEBUG 1
 
 /*
  * Split PBKDF2$... string into their components. The caller must free()
@@ -166,8 +166,9 @@ int sha1_check(char *password, char *hash)
 {
 	int match;
 	unsigned char obuf[20];
+	unsigned char i;
 
-    SHA1(password, strlen(password), obuf);
+	SHA1((unsigned char *)password, strlen(password), obuf);
 #ifdef PWDEBUG
 		fprintf(stderr, "SHA1 ");
 		for (i = 0; i < 20; i++) {
@@ -176,13 +177,13 @@ int sha1_check(char *password, char *hash)
 		fprintf(stderr, "\n");
 #endif
 
-	unsigned char i, code;
+	char code[3];
 	match = 1;
 	for(i=0; i<20; i++) {
-	    code == strtol(hash + (i*2), hash + (i*2) + 2, 16);
-	    if (code != obuf[i]) {
-			match = 0;
-			break;
+		sprintf(code, "%02x", obuf[i]);
+
+		if ((code[0] != hash[i*2]) || (code[1] != hash[i*2 + 1])) {
+			match = match * 0;
 		}
 	}
 
