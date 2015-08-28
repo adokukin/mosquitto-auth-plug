@@ -81,6 +81,7 @@ struct backend_p {
 };
 
 int pbkdf2_check(char *password, char *hash);
+int sha1_check(char *password, char *hash);
 
 int mosquitto_auth_plugin_version(void)
 {
@@ -415,7 +416,7 @@ int mosquitto_auth_unpwd_check(void *userdata, const char *username, const char 
 			break;
 		}
 		if (phash != NULL) {
-			match = pbkdf2_check((char *)password, phash);
+			match = sha1_check((char *)password, phash);
 			if (match == 1) {
 				authenticated = TRUE;
 				/* Mark backend index in userdata so we can check
