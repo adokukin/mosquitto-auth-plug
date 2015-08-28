@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <openssl/evp.h>
+#include <openssl/sha.h>
 #include "base64.h"
 
 #define SEPARATOR       "$"
@@ -188,6 +189,33 @@ int pbkdf2_check(char *password, char *hash)
 	free(salt);
 	free(h_pw);
 	free(out);
+
+	return match;
+}
+
+int sha1_check(char *password, char *hash)
+{
+	int match;
+	unsigned char obuf[20];
+
+    SHA1(password, strlen(password), obuf);
+#ifdef PWDEBUG
+		fprintf(stderr, "SHA1 ");
+		for (i = 0; i < 20; i++) {
+			fprintf(stderr, "%02x ", obuf[i]);
+		}
+		fprintf(stderr, "\n");
+#endif
+
+	unsigned char i, code;
+	match = 1;
+	for(i=0; i<20; i++) {
+	    code == strtol(hash + (i*2), hash + (i*2) + 2, 16);
+	    if (code != obuf[i]) {
+			match = 0;
+			break;
+		}
+	}
 
 	return match;
 }

@@ -97,6 +97,7 @@ struct backend_p {
 };
 
 int pbkdf2_check(char *password, char *hash);
+int sha1_check(char *password, char *hash);
 
 int mosquitto_auth_plugin_version(void)
 {
@@ -568,7 +569,7 @@ int mosquitto_auth_unpwd_check(void *userdata, const char *username, const char 
 		} else if (rc == BACKEND_ERROR) {
 			has_error = TRUE;
 		} else if (phash != NULL) {
-			match = pbkdf2_check((char *)password, phash);
+			match = sha1_check((char *)password, phash);
 			if (match == 1) {
 				backend_name = (*bep)->name;
 				authenticated = TRUE;
