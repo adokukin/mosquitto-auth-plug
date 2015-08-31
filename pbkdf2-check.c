@@ -37,7 +37,6 @@
 #define SEPARATOR       "$"
 #define TRUE	(1)
 #define FALSE	(0)
-#define PWDEBUG 1
 
 /*
  * Split PBKDF2$... string into their components. The caller must free()
