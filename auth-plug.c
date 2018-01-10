@@ -618,10 +618,6 @@ int mosquitto_auth_acl_check(void *userdata, const char *clientid, const char *u
 	}
 #endif
 
-	if (!username || !*username) { 	// anonymous users
-		username = ud->anonusername;
-	}
-
 	/* We are using pattern based acls. Check whether the username or
 	 * client id contains a +, # or / and if so deny access.
 	 *
@@ -645,6 +641,11 @@ int mosquitto_auth_acl_check(void *userdata, const char *clientid, const char *u
 		topic ? topic : "NULL",
 		access == MOSQ_ACL_READ ? "MOSQ_ACL_READ" : "MOSQ_ACL_WRITE" );
 
+	if (!username || !*username) { 	// anonymous users
+		username = ud->anonusername;
+		granted =  MOSQ_DENY_ACL;
+		goto outout;
+	}
 
 	granted = acl_cache_q(clientid, username, topic, access, userdata);
 	if (granted != MOSQ_ERR_UNKNOWN) {
