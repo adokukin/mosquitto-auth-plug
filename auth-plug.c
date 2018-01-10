@@ -449,16 +449,17 @@ int mosquitto_auth_acl_check(void *userdata, const char *clientid, const char *u
 	int match = 0, authorized = FALSE, nord;
 	int granted = MOSQ_ERR_ACL_DENIED;
 
-	if (!username || !*username) { 	// anonymous users
-		username = ud->anonusername;
-	}
-
 	_log(DEBUG, "mosquitto_auth_acl_check(..., %s, %s, %s, %s)",
 		clientid ? clientid : "NULL",
 		username ? username : "NULL",
 		topic ? topic : "NULL",
 		access == MOSQ_ACL_READ ? "MOSQ_ACL_READ" : "MOSQ_ACL_WRITE" );
 
+	if (!username || !*username) { 	// anonymous users
+		username = ud->anonusername;
+		granted =  MOSQ_ERR_ACL_DENIED;
+		goto outout;
+	}
 
 	granted = cache_q(clientid, username, topic, access, userdata);
 	if (granted != MOSQ_ERR_UNKNOWN) {
