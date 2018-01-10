@@ -633,7 +633,8 @@ int mosquitto_auth_acl_check(void *userdata, const char *clientid, const char *u
 #endif
 
 	if (!username || !*username) { 	// anonymous users
-		username = ud->anonusername;
+		_log(MOSQ_LOG_NOTICE, "ACL denying access to anonymous user");
+		return MOSQ_DENY_ACL;
 	}
 
 	/* We are using pattern based acls. Check whether the username or
