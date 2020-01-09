@@ -499,12 +499,12 @@ int mosquitto_auth_security_cleanup(void *userdata, struct mosquitto_auth_opt *a
 
 
 #if MOSQ_AUTH_PLUGIN_VERSION >=3
-int mosquitto_auth_unpwd_check(void *userdata, const struct mosquitto *client, const char *username, const char *password)
+int mosquitto_auth_unpwd_check(void *user_data, struct mosquitto *client, const char *username, const char *password)
 #else
 int mosquitto_auth_unpwd_check(void *userdata, const char *username, const char *password)
 #endif
 {
-	struct userdata *ud = (struct userdata *)userdata;
+	struct userdata *ud = (struct userdata *)user_data;
 	struct backend_p **bep;
 	char *phash = NULL, *backend_name = NULL;
 	int match, authenticated = FALSE, nord, granted, rc, has_error = FALSE;
@@ -531,7 +531,7 @@ int mosquitto_auth_unpwd_check(void *userdata, const char *username, const char 
 	}
 #endif
 
-	granted = auth_cache_q(username, password, userdata);
+	granted = auth_cache_q(username, password, user_data);
 	if (granted != MOSQ_ERR_UNKNOWN) {
 		_log(LOG_DEBUG, "getuser(%s) CACHEDAUTH: %d",
 			username, (granted == MOSQ_ERR_SUCCESS) ? TRUE : FALSE);
@@ -593,17 +593,17 @@ int mosquitto_auth_unpwd_check(void *userdata, const char *username, const char 
 			username);
 		granted = MOSQ_ERR_UNKNOWN;
 	}
-	auth_cache(username, password, granted, userdata);
+	auth_cache(username, password, granted, user_data);
 	return granted;
 }
 
 #if MOSQ_AUTH_PLUGIN_VERSION >= 3
-int mosquitto_auth_acl_check(void *userdata, int access, const struct mosquitto *client, const struct mosquitto_acl_msg *msg)
+int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *client, const struct mosquitto_acl_msg *msg)
 #else
 int mosquitto_auth_acl_check(void *userdata, const char *clientid, const char *username, const char *topic, int access)
 #endif
 {
-	struct userdata *ud = (struct userdata *)userdata;
+	struct userdata *ud = (struct userdata *)user_data;
 	struct backend_p **bep;
 	char *backend_name = NULL;
 	int match = 0, authorized = FALSE, has_error = FALSE;
@@ -659,7 +659,7 @@ int mosquitto_auth_acl_check(void *userdata, const char *clientid, const char *u
 		access == MOSQ_ACL_READ ? "MOSQ_ACL_READ" : "MOSQ_ACL_WRITE" );
 
 
-	granted = acl_cache_q(clientid, username, topic, access, userdata);
+	granted = acl_cache_q(clientid, username, topic, access, user_data);
 	if (granted != MOSQ_ERR_UNKNOWN) {
 		_log(LOG_DEBUG, "aclcheck(%s, %s, %d) CACHEDAUTH: %d",
 			username, topic, access, granted);
@@ -742,20 +742,20 @@ int mosquitto_auth_acl_check(void *userdata, const char *clientid, const char *u
 		granted = MOSQ_ERR_UNKNOWN;
 	}
 
-	acl_cache(clientid, username, topic, access, granted, userdata);
+	acl_cache(clientid, username, topic, access, granted, user_data);
 	return (granted);
 
 }
 
 
 #if MOSQ_AUTH_PLUGIN_VERSION >= 3
-int mosquitto_auth_psk_key_get(void *userdata, const struct mosquitto *client, const char *hint, const char *identity, char *key, int max_key_len)
+int mosquitto_auth_psk_key_get(void *user_data, struct mosquitto *client, const char *hint, const char *identity, char *key, int max_key_len)
 #else
 int mosquitto_auth_psk_key_get(void *userdata, const char *hint, const char *identity, char *key, int max_key_len)
 #endif
 {
 #if BE_PSK
-	struct userdata *ud = (struct userdata *)userdata;
+	struct userdata *ud = (struct userdata *)user_data;
 	struct backend_p **bep;
 	char *database = p_stab("psk_database");
 	char *psk_key = NULL, *username;
