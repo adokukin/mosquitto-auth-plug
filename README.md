@@ -202,7 +202,7 @@ In the following example, the table has an `INT(1)` column `rw` containing `1` f
 readonly topics, and `2` for read-write topics:
 
 ```sql
-SELECT topic FROM acls WHERE (username = '%s') AND (rw >= %d)
+SELECT topic FROM acls WHERE (username = '%s') AND (rw & %d)
 ```
 
 Sample Mosquitto configuration (e.g., `mosquitto.conf`) for the `mysql` back-end:
@@ -217,7 +217,7 @@ auth_opt_pass supersecret
 auth_opt_userquery SELECT pw FROM users WHERE username = '%s'
 # auth_opt_userquery SELECT pwhash FROM user WHERE username = '%s' AND clientid = '%s'
 auth_opt_superquery SELECT COUNT(*) FROM users WHERE username = '%s' AND super = 1
-auth_opt_aclquery SELECT topic FROM acls WHERE (username = '%s') AND (rw >= %d)
+auth_opt_aclquery SELECT topic FROM acls WHERE (username = '%s') AND (rw & %d)
 auth_opt_anonusername AnonymouS
 ```
 
